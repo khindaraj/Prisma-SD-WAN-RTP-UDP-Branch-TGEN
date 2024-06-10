@@ -1,4 +1,17 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
+
+"""
+This Python script generates and transmits RTP traffic streams to a specified destination. 
+
+**Key Features:**
+
+* **Hostname Resolution:** Accepts a hostname or IP address for the destination and attempts to resolve the hostname if necessary.
+* **Configurable Traffic Parameters:** Allows customization of source and destination ports, minimum and maximum packet count, and source IP address (if desired).
+* **Random Payload Generation:** Generates random data for the UDP payload within each RTP packet.
+* **Scapy Library Integration:** Leverages the Scapy library for efficient packet crafting and transmission.
+
+"""
+
 import time
 import argparse
 import random
@@ -11,18 +24,19 @@ from scapy.layers.l2 import Ether
 from scapy.layers.rtp import RTP
 from scapy.packet import Raw
 from scapy.sendrecv import send, sendp
+from socket import gethostbyname  # Import for hostname resolution
 
 logging.getLogger("scapy").setLevel(1)
 
 if __name__ == "__main__":
 
-    # parse arguments
+    # Parse arguments
     parser = argparse.ArgumentParser()
 
     # Allow Controller modification and debug level sets.
     binding_group = parser.add_argument_group('Binding', 'These options change how traffic is bound/sent')
-    binding_group.add_argument("--destination-ip", "-dip", "-D", help="Destination IP for the RTP stream",
-                               type=str, required=True)
+    binding_group.add_argument("--destination-host", "-dh", "-H", help="Destination hostname or IP for the RTP stream",
+                               required=True)
     binding_group.add_argument("--destination-port", "-dport",
                                help="Destination port for the RTP stream (Default 6100)", type=int,
                                default=6100)
@@ -44,6 +58,26 @@ if __name__ == "__main__":
                                type=int, default=90000)
 
     args = vars(parser.parse_args())
+
+    print("Setting up RTP Packets")
+    udp_payload = []
+    # 212 = 240 - IP headler len  - UDP header len - RTP header length ==> 240 - 20 - 8 - 12
+    for i in range(200):
+        tmp = bytes("{:02x}".format(random.randrange(0, 255)))
+        tmp = tmp.decode("hex")
+        udp_payload.append(tmp)
+
+    # Resolve destination IP from hostname (if provided)
+    destination_host = args['destination_host']
+    if not destination_host.isdigit():
+        try:
+            args['destination_ip'] = gethostbyname(destination_host)
+            print(f"Resolved destination hostname '{destination_host}' to IP: {args['destination_ip']}")
+        except socket.gaierror as e:
+            print(f"Error resolving hostname '{destination_host}': {e}")
+            exit(1)
+    else:
+        args['destination_ip'] = destination_host  # Use provided IP address
 
     print("Setting up RTP Packets")
     udp_payload = []
