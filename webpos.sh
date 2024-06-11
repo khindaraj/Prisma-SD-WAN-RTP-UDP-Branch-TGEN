@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /root
+#cd /root
 
 # Function to get the reachable interface
 function getReachableInterface() {
