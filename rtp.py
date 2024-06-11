@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 This Python script generates and transmits RTP traffic streams to a specified destination. 
 
