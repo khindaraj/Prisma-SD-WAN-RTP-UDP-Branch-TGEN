@@ -13,9 +13,9 @@ rtp.sh = shell script wrapper for the python script rtp.py that does RTP traffic
 #### Requirements
 
 * Ubuntu 18.04 or similar
-* Python <= 2.7 
+* Python3
 * Python modules:
-  * scapy >= 2.4.3
+  * scapy
 * curl 
 
 
