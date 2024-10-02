@@ -6,8 +6,8 @@ After=check_hosts_entry.service
 [Service]
 Type=simple
 User=lab-user
-ExecStart=/bin/bash -c 'until systemctl show -p SubState check_hosts_entry.service | grep -q "dead"; do sleep 10; done && /home/lab-user/scripts/Prisma-SD-WAN-RTP-UDP-Branch-TGEN/rtp.sh webpos.sasedemo.net &'
-Restart=always
+ExecStart=/bin/bash -c 'until systemctl show -p SubState check_hosts_entry.service | grep -q "dead"; do sleep 10; done && sudo /bin/bash /home/lab-user/scripts/Prisma-SD-WAN-RTP-UDP-Branch-TGEN/rtp.sh /home/lab-user/scripts/Prisma-SD-WAN-RTP-UDP-Branch-TGEN webpos.sasedemo.net'
+Restart=on-failure
 RestartSec=5
 StandardOutput=syslog
 StandardError=syslog
