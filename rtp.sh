@@ -54,7 +54,7 @@ while true; do
   fi
 
   # Run the Python script explicitly with Python3
-  sudo python3 "$SCRIPT_DIR/rtp.py" --destination-host "$IP_ADDRESS" || echo "Error: rtp.py execution failed."
+  sudo /usr/bin/python3 "$SCRIPT_DIR/rtp.py" --destination-host "$IP_ADDRESS" || echo "Error: rtp.py execution failed."
 
   # Generate random sleep time
   s=$(shuf -i 1-30 -n 1)
