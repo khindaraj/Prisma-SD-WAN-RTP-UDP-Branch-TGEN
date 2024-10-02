@@ -60,8 +60,9 @@ if __name__ == "__main__":
     udp_payload = []
     # 212 = 240 - IP headler len  - UDP header len - RTP header length ==> 240 - 20 - 8 - 12
     for i in range(200):
-        tmp = bytes("{:02x}".format(random.randrange(0, 255)))
-        tmp = tmp.decode("hex")
+        #tmp = bytes("{:02x}".format(random.randrange(0, 255)))
+        #tmp = tmp.decode("hex")
+        tmp = bytes.fromhex("{:02x}".format(random.randrange(0, 255)))
         udp_payload.append(tmp)
 
     # Resolve destination IP from hostname (if provided)
@@ -80,8 +81,9 @@ if __name__ == "__main__":
     udp_payload = []
     # 212 = 240 - IP headler len  - UDP header len - RTP header length ==> 240 - 20 - 8 - 12
     for i in range(200):
-        tmp = bytes("{:02x}".format(random.randrange(0, 255)))
-        tmp = tmp.decode("hex")
+        #tmp = bytes("{:02x}".format(random.randrange(0, 255)))
+        #tmp = tmp.decode("hex")
+        tmp = bytes.fromhex("{:02x}".format(random.randrange(0, 255)))
         udp_payload.append(tmp)
 
     # pull args for count.
