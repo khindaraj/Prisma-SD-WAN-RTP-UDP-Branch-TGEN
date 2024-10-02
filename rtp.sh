@@ -65,7 +65,7 @@ while true; do
   fi
 
   # Run rtp.py with the resolved IP address
-  "$SCRIPT_DIR/rtp.py" --destination-host "$IP_ADDRESS" || echo "Error: rtp.py execution failed."
+  python3 "$SCRIPT_DIR/rtp.py" --destination-host "$IP_ADDRESS" || echo "Error: rtp.py execution failed."
 
   # Generate random sleep time
   s=$(shuf -i 1-30 -n 1)
