@@ -1,22 +1,7 @@
-"""
-This Python script generates and transmits RTP traffic streams to a specified destination. 
-
-**Key Features:**
-
-* **Hostname Resolution:** Accepts a hostname or IP address for the destination and attempts to resolve the hostname if necessary.
-* **Configurable Traffic Parameters:** Allows customization of source and destination ports, minimum and maximum packet count, and source IP address (if desired).
-* **Random Payload Generation:** Generates random data for the UDP payload within each RTP packet.
-* **Scapy Library Integration:** Leverages the Scapy library for efficient packet crafting and transmission.
-
-"""
-
 import time
 import argparse
 import random
-
-# Set log level to benefit from Scapy warnings
 import logging
-
 from scapy.layers.inet import IP, UDP
 from scapy.layers.l2 import Ether
 from scapy.layers.rtp import RTP
@@ -24,6 +9,7 @@ from scapy.packet import Raw
 from scapy.sendrecv import send, sendp
 from socket import gethostbyname  # Import for hostname resolution
 
+# Set log level to benefit from Scapy warnings
 logging.getLogger("scapy").setLevel(1)
 
 if __name__ == "__main__":
@@ -58,11 +44,12 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
 
     print("Setting up RTP Packets")
+
+    # Create the payload for UDP packets, in Python 3 bytes must be used
     udp_payload = []
-    # 212 = 240 - IP headler len  - UDP header len - RTP header length ==> 240 - 20 - 8 - 12
     for i in range(200):
-        tmp = bytes("{:02x}".format(random.randrange(0, 255)))
-        tmp = tmp.decode("hex")
+        # Generating random byte data for the payload
+        tmp = random.randrange(0, 255).to_bytes(1, byteorder='big')
         udp_payload.append(tmp)
 
     # Resolve destination IP from hostname (if provided)
@@ -77,24 +64,16 @@ if __name__ == "__main__":
     else:
         args['destination_ip'] = destination_host  # Use provided IP address
 
-    print("Setting up RTP Packets")
-    udp_payload = []
-    # 212 = 240 - IP headler len  - UDP header len - RTP header length ==> 240 - 20 - 8 - 12
-    for i in range(200):
-        tmp = bytes("{:02x}".format(random.randrange(0, 255)))
-        tmp = tmp.decode("hex")
-        udp_payload.append(tmp)
-
-    # pull args for count.
+    # Pull arguments for packet count
     min_count = args['min_count']
     max_count = args['max_count']
     count = random.randrange(min_count, max_count)
-    print("sending: {0} packets".format(count))
+    print(f"sending: {count} packets")
 
-    source_port = random.randrange(10000, 65535)
-    # delete IP and UDP checksum so that they can be re computed.
-    for i in range(1, count, 1):
+    source_port = random.randrange(10000, 65535)  # Randomize source port
 
+    # Begin sending packets
+    for i in range(1, count + 1):
         if args['source_interface'] is None:
             if args['source_ip'] is None:
                 packet = IP(dst=args['destination_ip'], proto=17, len=240)
@@ -106,23 +85,27 @@ if __name__ == "__main__":
                 packet = IP(dst=args['destination_ip'], proto=17, len=240)
             else:
                 packet = IP(dst=args['destination_ip'], src=args['source_ip'], proto=17, len=240)
-        # do this for all streams
-        packet = packet/UDP(sport=source_port, dport=args['destination_port'], len=220)
-        packet = packet/RTP(version=2, payload_type=8, sequence=i, sourcesync=1, timestamp=time.time())
-        packet = packet/Raw(load="".join(udp_payload))
 
+        # Creating RTP packet
+        packet = packet / UDP(sport=source_port, dport=args['destination_port'], len=220)
+        packet = packet / RTP(version=2, payload_type=8, sequence=i, sourcesync=1, timestamp=int(time.time()))
+        packet = packet / Raw(load=b"".join(udp_payload))  # Ensuring payload is bytes
+
+        # Remove checksums to allow Scapy to recalculate them
         if args['source_interface'] is not None:
             del packet[Ether].chksum
         del packet[IP].chksum
         del packet[UDP].chksum
 
+        # Send packet using appropriate method
         if args['source_interface'] is None:
             output = send(packet, verbose=False)
         else:
             output = sendp(packet, iface=args['source_interface'], verbose=False)
-        # output = send(packet, verbose=False)
+
+        # Introduce delay between packet transmissions
         time.sleep(0.03)
 
-    # enable these for additional debugs
+    # Uncomment for debugging output
     # print(packet.show())
-    # print("Sending the above packet on interface {0}".format(args['source_interface']))
+    # print(f"Sending the above packet on interface {args['source_interface']}")
