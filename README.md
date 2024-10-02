@@ -16,7 +16,8 @@ rtp.sh = shell script wrapper for the python script rtp.py that does RTP traffic
 * Python3
 * Python modules:
   * scapy
-* curl 
+* curl
+*  notify-tools
 
 
 #### License
