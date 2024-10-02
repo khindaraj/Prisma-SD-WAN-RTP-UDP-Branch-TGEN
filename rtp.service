@@ -1,0 +1,17 @@
+[Unit]
+Description=RTP Traffic Generator - Target: webpos.sasedemo.net
+Requires=check_hosts_entry.service
+After=check_hosts_entry.service
+
+[Service]
+Type=simple
+User=lab-user
+ExecStart=/bin/bash -c 'until systemctl show -p SubState check_hosts_entry.service | grep -q "dead"; do sleep 10; done && /home/lab-user/scripts/Prisma-SD-WAN-RTP-UDP-Branch-TGEN/rtp.sh webpos.sasedemo.net &'
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogLevel=info
+
+[Install]
+WantedBy=multi-user.target
