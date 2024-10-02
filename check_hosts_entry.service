@@ -1,0 +1,15 @@
+[Unit]
+Description=Check webpos.sasedemo.net entry in /etc/hosts
+Requires=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c 'while ! grep -q "webpos.sasedemo.net" /etc/hosts; do sleep 10; done; logger "webpos.sasedemo.net found in /etc/hosts"'
+Restart=on-failure
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogLevel=info
+
+[Install]
+WantedBy=multi-user.target
