@@ -10,19 +10,18 @@ This Python script generates and transmits RTP traffic streams to a specified de
 
 """
 
+#!/usr/bin/env python3
+
 import time
 import argparse
 import random
-
-# Set log level to benefit from Scapy warnings
 import logging
-
 from scapy.layers.inet import IP, UDP
 from scapy.layers.l2 import Ether
 from scapy.layers.rtp import RTP
 from scapy.packet import Raw
 from scapy.sendrecv import send, sendp
-from socket import gethostbyname  # Import for hostname resolution
+from socket import gethostbyname
 
 logging.getLogger("scapy").setLevel(1)
 
